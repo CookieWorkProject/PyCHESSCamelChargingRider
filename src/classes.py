@@ -386,22 +386,7 @@ class King(Piece):
                 elif board[x_temp][y_temp].color != self.color:
                     moves.append((x_temp, y_temp))
 
-        # Castling
-        if not self.check and (pos == self.start_pos):
-            if self.castling:
-                if isinstance(board[x][y + 3], Castle):
-                    if board[x][y + 3].castling:
-                        if board[x][y + 1] == "--" and board[x][y + 2] == "--":
-                            moves.append((x, y + 2))
-
-                if isinstance(board[x][y - 4], Castle):
-                    if board[x][y - 4].castling:
-                        if (
-                            board[x][y - 1] == "--"
-                            and board[x][y - 2] == "--"
-                            and board[x][y - 3] == "--"
-                        ):
-                            moves.append((x, y - 2))
+        
 
         return moves
 
@@ -513,117 +498,146 @@ class Castle(Piece):
 
     def __init__(self, image, color):
         """
-        Initialize the Rook piece.
+        Initialize the Knight.
 
-        This method initializes the Rook by calling the superclass's
+        This method initializes the Knight by calling the superclass's
         (Piece) initializer with the image file and color of the piece.
-        It has initial position attribute, start_pos, that is set during the initialization of the Game_State
-        The castling attribute is set to True to indicate that the Rook is initially eligible for castling.
 
-        :param image: The image file of the Rook.
+        :param image: The image file of the Knight.
         :type image: str
-        :param color: The color of the Rook.
+        :param color: The color of the Knight.
         :type color: str
         :return: None
         """
         Piece.__init__(self, image, color)
-        Piece.__init__(self, image, color)
-        self.start_pos = None
-        self.castling = True
 
     def get_moves(self, pos, board):
         """
-        Get the possible moves for the Rook.
+        Get the possible moves for the Knight chess piece.
 
-        This method calculates the possible moves for the Rook based on its current position on the chessboard and the state of the board.
-        It iterates over the predefined directions (horizontal and vertical) to explore possible moves in each direction.
-        For each direction, it continues moving in that direction until it encounters the edge of the board or another piece.
-        If an empty square is encountered, it is added to the list of moves.
-        If an opponent's piece is encountered, it is also added to the list of moves, but the iteration in that direction is stopped.
-        If a piece of the same color is encountered, the iteration in that direction is stopped.
+        This method calculates the possible moves for the Knight based on its current position on the chessboard and the state of the board.
+        The Knight has a unique movement pattern, which involves moving in an L-shape: two squares in one direction (vertical or horizontal) and one square in a perpendicular direction.
+        The method generates all potential moves for the Knight and checks if each move is within the boundaries of the chessboard.
+        If the target square is empty, it is considered a valid move.
+        If the target square contains an opponent's piece, it is also considered a valid move.
+        The method returns a list of all valid moves for the Knight.
 
-        :param pos: The current position of the Rook on the chessboard.
+        :param pos: The current position of the Knight on the chessboard.
         :type pos: tuple
         :param board: The chess board.
         :type board: List
-        :return: A list of possible moves for the Rook.
+        :return: A list of possible moves for the Knight.
         :rtype: List
         """
-        x, y = pos
-        directions = [(1, 0), (-1, 0), (0, 1), (0, -1)]
         moves = []
+        x, y = pos
 
-        for dx, dy in directions:
-            x_temp, y_temp = x + dx, y + dy
-            while 0 <= x_temp < len(board) and 0 <= y_temp < len(board[x_temp]):
-                if board[x_temp][y_temp] != "--":
-                    if board[x_temp][y_temp].color == self.color:
-                        break
-                    else:
-                        moves.append((x_temp, y_temp))
-                        break
-                moves.append((x_temp, y_temp))
-                x_temp += dx
-                y_temp += dy
+        direction = 1 if self.color == "white" else -1
 
+        potential_moves = [
+            (2 * direction, 1),
+            (2 * direction, -1),
+            (1 * direction, 2),
+            (1 * direction, -2),
+            (-1 * direction, 2),
+            (-1 * direction, -2),
+            (-2 * direction, 1),
+            (-2 * direction, -1),
+            
+        ]
+        
+        for move in potential_moves:
+            multiplier = 1
+            xPos = x+move[0]*multiplier
+            yPos = y+move[1]*multiplier
+            while 0 <= xPos <= 7 and 0 <= yPos <= 7:
+                
+                if board[xPos][yPos] == "--":
+                    moves.append((xPos,yPos))
+                elif board[xPos][yPos].color != self.color:
+                    moves.append((xPos,yPos ))
+                    break
+                elif board[xPos][yPos].color == self.color:
+                    break
+                multiplier+=1
+                xPos = x+move[0]*multiplier
+                yPos = y+move[1]*multiplier
+        
         return moves
 
 
 class Bishop(Piece):
     """
-    Represents the Bishop.
+    Represents the Knight.
     """
 
     def __init__(self, image, color):
         """
-        Initialize the Bishop.
+        Initialize the Knight.
 
-        This method initializes the Bishop by calling the superclass's
+        This method initializes the Knight by calling the superclass's
         (Piece) initializer with the image file and color of the piece.
 
-        :param image: The image file of the Bishop.
+        :param image: The image file of the Knight.
         :type image: str
-        :param color: The color of the Bishop.
+        :param color: The color of the Knight.
         :type color: str
         :return: None
         """
         Piece.__init__(self, image, color)
 
     def get_moves(self, pos, board):
-        """ "
-        Get the possible moves for the Bishop.
+        """
+        Get the possible moves for the Knight chess piece.
 
-        This method calculates the possible moves for the Bishop based on its current position on the chessboard and the state of the board.
-        It iterates over the predefined directions (diagonal) to explore possible moves in each direction.
-        For each direction, it continues moving in that direction until it encounters the edge of the board or another piece.
-        If an empty square is encountered, it is added to the list of moves.
-        If an opponent's piece is encountered, it is also added to the list of moves, but the iteration in that direction is stopped.
-        If a piece of the same color is encountered, the iteration in that direction is stopped.
+        This method calculates the possible moves for the Knight based on its current position on the chessboard and the state of the board.
+        The Knight has a unique movement pattern, which involves moving in an L-shape: two squares in one direction (vertical or horizontal) and one square in a perpendicular direction.
+        The method generates all potential moves for the Knight and checks if each move is within the boundaries of the chessboard.
+        If the target square is empty, it is considered a valid move.
+        If the target square contains an opponent's piece, it is also considered a valid move.
+        The method returns a list of all valid moves for the Knight.
 
-        :param pos: The current position of the Bishop on the chessboard.
+        :param pos: The current position of the Knight on the chessboard.
         :type pos: tuple
         :param board: The chess board.
         :type board: List
-        :return: A list of possible moves for the Bishop.
+        :return: A list of possible moves for the Knight.
         :rtype: List
         """
-        x, y = pos
-        directions = [(1, 1), (-1, 1), (1, -1), (-1, -1)]
         moves = []
+        x, y = pos
 
-        for dx, dy in directions:
-            x_temp, y_temp = x + dx, y + dy
-            while 0 <= x_temp < len(board) and 0 <= y_temp < len(board[x_temp]):
-                if board[x_temp][y_temp] != "--":
-                    if board[x_temp][y_temp].color == self.color:
-                        break
-                    else:
-                        moves.append((x_temp, y_temp))
-                        break
-                moves.append((x_temp, y_temp))
-                x_temp += dx
-                y_temp += dy
+        direction = 1 if self.color == "white" else -1
 
+        potential_moves = [
+            
+            
+            (x - 1 * direction, y + 2),
+            (x - 1 * direction, y - 2),
+            (x - 2 * direction, y + 1),
+            (x - 2 * direction, y - 1),
+            
+        ]
+
+        for move in potential_moves:
+            if 0 <= move[0] <= 7 and 0 <= move[1] <= 7:
+                if board[move[0]][move[1]] == "--":
+                    moves.append(move)
+                elif board[move[0]][move[1]].color != self.color:
+                    moves.append(move)
+        potential_moves = [
+            
+            (x + 1 * direction, y + 1),
+            (x + 1 * direction, y - 1),
+            (x + 1 * direction, y - 0),
+            
+            
+        ]
+        for move in potential_moves:
+            if 0 <= move[0] <= 7 and 0 <= move[1] <= 7:
+                if board[move[0]][move[1]] == "--":
+                    moves.append(move)
+                
         return moves
 
 
@@ -679,6 +693,14 @@ class Knight(Piece):
             (x - 1 * direction, y - 2),
             (x - 2 * direction, y + 1),
             (x - 2 * direction, y - 1),
+            (x + 3 * direction, y + 1),
+            (x + 3 * direction, y - 1),
+            (x + 1 * direction, y + 3),
+            (x + 1 * direction, y - 3),
+            (x - 1 * direction, y + 3),
+            (x - 1 * direction, y - 3),
+            (x - 3 * direction, y + 1),
+            (x - 3 * direction, y - 1),
         ]
 
         for move in potential_moves:
